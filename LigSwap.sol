@@ -15,4 +15,24 @@ contract TokenSwap {
         _;
     }
 
+    constructor(address _tokenA, address _tokenB) {
+        owner = msg.sender;
+        tokenA = IERC20(_tokenA);
+        tokenB = IERC20(_tokenB);
+    }
+
+function swapTokens(uint256 _amountA, uint256 _amountB) external {
+        require(_amountA > 0 && _amountB > 0, "Amounts must be greater than 0");
+
+        // Transfer tokens from the swapper to the contract
+        require(tokenA.transferFrom(msg.sender, address(this), _amountA), "TokenA transfer failed");
+        require(tokenB.transferFrom(msg.sender, address(this), _amountB), "TokenB transfer failed");
+
+        // Swap tokens between the swapper and the contract
+        require(tokenA.transfer(msg.sender, _amountB), "TokenA transfer failed");
+        require(tokenB.transfer(msg.sender, _amountA), "TokenB transfer failed");
+
+        emit TokensSwapped(msg.sender, _amountA, _amountB);
+    }
+
 }
